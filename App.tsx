@@ -18,7 +18,8 @@ import {
   useColorScheme,
   View,
   NativeModules,
-  ToastAndroid
+  ToastAndroid,
+  Switch
 } from 'react-native';
 
 import {
@@ -85,12 +86,12 @@ const connectUsb = async () => {
 };
 
 // Enviar '1' al dispositivo USB
-const sendOne = async () => {
+const sendOne = async (comando:String) => {
   try {
     const response = await UsbSerial.sendData("1");
     console.log(response);
     if(response == "Data sent: 1"){
-      sendZero()
+      sendZero(comando)
     }
   } catch (error) {
     console.error("Error enviando datos:", error);
@@ -98,7 +99,7 @@ const sendOne = async () => {
 };
 
 // Enviar '0' al dispositivo USB
-const sendZero = async () => {
+const sendZero = async (comando:String) => {
   try {
     const response = await UsbSerial.sendData("0");
     console.log(response);
@@ -123,6 +124,22 @@ connectUsb();
 //setTimeout(sendZero, 2000); // Enviar '0' después de 2 segundos
 //setTimeout(closeUsb, 4000); // Cerrar conexión después de 4 segundos
 
+const [isEnabled, setIsEnabled] = useState(false);
+
+
+// Cambia el estado del switch y envía 1 o 0
+const toggleSwitch = () => {
+  const newValue = !isEnabled ? 1 : 0; // Si está apagado, enviamos 1, si está encendido, enviamos 0
+  setIsEnabled(!isEnabled);
+
+  if(newValue==1){
+    sendOne("1")
+  }else{
+    sendZero("0")
+  }
+  //sendData(newValue);
+};
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -144,6 +161,18 @@ connectUsb();
         color:'green'
       }}>Boton Enviar</Text>
      </TouchableOpacity>
+
+     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ fontSize: 20, marginBottom: 10 }}>
+        Estado: {isEnabled ? "Encendido (1)" : "Apagado (0)"}
+      </Text>
+      <Switch
+        trackColor={{ false: "#767577", true: "#81b0ff" }}
+        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+        onValueChange={toggleSwitch}
+        value={isEnabled}
+      />
+    </View>
     </SafeAreaView>
   );
 }
