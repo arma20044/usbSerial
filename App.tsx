@@ -17,7 +17,8 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
-  NativeModules
+  NativeModules,
+  ToastAndroid
 } from 'react-native';
 
 import {
@@ -29,6 +30,8 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 const ToastService = NativeModules.ToastModule;
+
+const { UsbSerial } = NativeModules;
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -45,6 +48,10 @@ function App(): React.JSX.Element {
 
   const [text, setText] = useState('');
 
+  UsbSerial.listDevices((count) => {
+    console.log(`Dispositivos USB conectados: ${count}`);
+   // ToastAndroid.show(count,10)
+  });
 
   return (
     <SafeAreaView style={backgroundStyle}>
