@@ -76,7 +76,7 @@ const connectUsb = async () => {
   try {
     const response = await UsbSerial.connectUsb();
     if(response==="USB Serial connected"){
-      sendOne();
+     // sendOne("1");
     }
     
     console.log(response);
@@ -91,7 +91,7 @@ const sendOne = async (comando:String) => {
     const response = await UsbSerial.sendData("1");
     console.log(response);
     if(response == "Data sent: 1"){
-      sendZero(comando)
+     // sendZero(comando)
     }
   } catch (error) {
     console.error("Error enviando datos:", error);
