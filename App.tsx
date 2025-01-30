@@ -31,7 +31,8 @@ import {
 
 const ToastService = NativeModules.ToastModule;
 
-const { UsbSerial } = NativeModules;
+const { UsbSerial } = NativeModules;  // 👈 Asegurar que UsbSerial existe
+
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -48,10 +49,79 @@ function App(): React.JSX.Element {
 
   const [text, setText] = useState('');
 
-  UsbSerial.listDevices((count) => {
-    console.log(`Dispositivos USB conectados: ${count}`);
-   // ToastAndroid.show(count,10)
-  });
+  // UsbSerial.listDevices((count) => {
+  //   console.log(`Dispositivos USB conectados: ${count}`);
+  //  // ToastAndroid.show(count,10)
+  // });
+
+  console.log("Funciones disponibles en UsbSerial:", Object.keys(ToastService));
+
+  // Solicitar permiso para usar USB
+const requestUsbPermission = async () => {
+  try {
+    const response = await UsbSerial.requestUsbPermission();
+    console.log(response);
+  } catch (error) {
+    console.error("Error solicitando permiso USB:", error);
+  }
+};
+
+// Ejecutar las funciones
+requestUsbPermission()
+  .then(() => setTimeout(connectUsb, 2000)); // Esperar 2s para conceder permiso
+
+// Conectar el USB
+const connectUsb = async () => {
+  try {
+    const response = await UsbSerial.connectUsb();
+    if(response==="USB Serial connected"){
+      sendOne();
+    }
+    
+    console.log(response);
+  } catch (error) {
+    console.error("Error conectando USB:", error);
+  }
+};
+
+// Enviar '1' al dispositivo USB
+const sendOne = async () => {
+  try {
+    const response = await UsbSerial.sendData("1");
+    console.log(response);
+    if(response == "Data sent: 1"){
+      sendZero()
+    }
+  } catch (error) {
+    console.error("Error enviando datos:", error);
+  }
+};
+
+// Enviar '0' al dispositivo USB
+const sendZero = async () => {
+  try {
+    const response = await UsbSerial.sendData("0");
+    console.log(response);
+  } catch (error) {
+    console.error("Error enviando datos:", error);
+  }
+};
+
+// Cerrar conexión USB
+const closeUsb = async () => {
+  try {
+    const response = await UsbSerial.closeUsb();
+    console.log(response);
+  } catch (error) {
+    console.error("Error cerrando USB:", error);
+  }
+};
+
+// Ejecutar las funciones
+connectUsb();
+
+//setTimeout(sendZero, 2000); // Enviar '0' después de 2 segundos
+//setTimeout(closeUsb, 4000); // Cerrar conexión después de 4 segundos
 
   return (
     <SafeAreaView style={backgroundStyle}>
